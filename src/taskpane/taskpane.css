@@ -1,0 +1,212 @@
+:root {
+  --bg: #ffffff;
+  --surface: #f6f6f6;
+  --border: #e1e1e1;
+  --text: #1b1a19;
+  --muted: #605e5c;
+  --accent: #0f6cbd;
+  --normal: #6bb700;
+  --slow: #f7a501;
+  --severe: #d13438;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1f1f1f;
+    --surface: #2b2b2b;
+    --border: #3d3d3d;
+    --text: #f3f2f1;
+    --muted: #a19f9d;
+    --accent: #479ef5;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.45 "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 1;
+}
+
+.bar h1 { font-size: 15px; font-weight: 600; margin: 0; }
+
+.bar button {
+  font: inherit;
+  font-size: 13px;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.bar button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.bar button:disabled { opacity: 0.45; cursor: default; }
+
+main { padding: 16px; }
+
+/* Summary ---------------------------------------------------------------- */
+
+.summary {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.total { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.total-value { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
+.total-label { color: var(--muted); font-size: 13px; }
+
+.facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; overflow-wrap: anywhere; }
+
+.warning {
+  border-left: 3px solid var(--slow);
+  background: color-mix(in srgb, var(--slow) 8%, transparent);
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  border-radius: 0 4px 4px 0;
+}
+
+/* Hops ------------------------------------------------------------------- */
+
+.hops { list-style: none; margin: 0; padding: 0; }
+
+.hop {
+  display: grid;
+  grid-template-columns: 22px 96px 1fr;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  position: relative;
+}
+
+.hop:first-child { border-top: none; }
+
+/* The connector line that makes the list read as a single path. */
+.hop::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+
+.hop:first-child::before { top: 22px; }
+.hop:last-child::before { bottom: calc(100% - 22px); }
+
+.hop-index {
+  position: relative;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.hop--worst .hop-index {
+  border-color: var(--severe);
+  color: var(--severe);
+  font-weight: 600;
+}
+
+.hop-delay { min-width: 0; }
+.hop-delay-value { font-size: 13px; font-variant-numeric: tabular-nums; font-weight: 600; }
+
+.hop-bar-track {
+  height: 4px;
+  margin-top: 5px;
+  border-radius: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.hop-bar { height: 100%; border-radius: 2px; background: var(--normal); }
+.hop--slow .hop-bar { background: var(--slow); }
+.hop--severe .hop-bar { background: var(--severe); }
+
+.hop-skew {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--slow);
+}
+
+.hop-body { min-width: 0; }
+.hop-host { font-weight: 600; overflow-wrap: anywhere; }
+.hop-from { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+
+.hop-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.chip {
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+/* Raw view --------------------------------------------------------------- */
+
+.raw { margin-top: 20px; font-size: 12px; }
+.raw summary { cursor: pointer; color: var(--muted); }
+.raw-heading { font-size: 12px; margin: 12px 0 4px; }
+
+.raw-line {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px;
+  margin: 8px 0 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* Empty and error states ------------------------------------------------- */
+
+.empty { padding: 32px 8px; text-align: center; color: var(--muted); }
+.empty-title { font-size: 14px; color: var(--text); margin: 0 0 6px; }
+.empty-detail { font-size: 13px; margin: 0; }

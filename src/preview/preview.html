@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mailflow preview</title>
+    <link rel="stylesheet" href="taskpane.css" />
+    <style>
+      /* Constrain to the width Outlook actually gives a task pane. */
+      body { max-width: 400px; border-right: 1px solid var(--border); min-height: 100vh; }
+      .picker { padding: 8px 16px; border-bottom: 1px solid var(--border); }
+      .picker select { width: 100%; font: inherit; padding: 4px; }
+    </style>
+  </head>
+  <body>
+    <header class="bar">
+      <h1>Delivery timeline</h1>
+      <button id="copy" type="button" disabled>Copy</button>
+    </header>
+    <div class="picker"><select id="fixture"></select></div>
+    <main id="content"></main>
+  </body>
+</html>
