@@ -77,6 +77,8 @@ module.exports = async (env, options) => {
         patterns: [
           { from: "assets/*", to: "assets/[name][ext][query]" },
           { from: "src/taskpane/taskpane.css", to: "taskpane.css" },
+          // Landing page, so the site root explains itself instead of 404ing.
+          { from: "src/site/index.html", to: "index.html" },
           {
             from: "manifest*.xml",
             to: "[name]" + "[ext]",

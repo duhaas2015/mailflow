@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mailflow — Outlook delivery timeline</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #ffffff; --surface: #f6f6f6; --border: #e1e1e1;
+        --text: #1b1a19; --muted: #605e5c; --accent: #0f6cbd;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #1f1f1f; --surface: #2b2b2b; --border: #3d3d3d;
+          --text: #f3f2f1; --muted: #a19f9d; --accent: #479ef5;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0 auto; padding: 48px 24px; max-width: 680px;
+        background: var(--bg); color: var(--text);
+        font: 16px/1.6 "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      }
+      h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: -0.02em; }
+      .tagline { color: var(--muted); margin: 0 0 32px; }
+      h2 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em;
+           color: var(--muted); margin: 32px 0 10px; }
+      .url {
+        display: flex; gap: 8px; align-items: stretch;
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 6px; padding: 6px 6px 6px 12px;
+      }
+      .url code {
+        flex: 1; align-self: center; overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 14px;
+      }
+      .url button {
+        font: inherit; font-size: 14px; padding: 6px 14px; cursor: pointer;
+        border: 1px solid var(--border); border-radius: 4px;
+        background: var(--bg); color: var(--text); white-space: nowrap;
+      }
+      .url button:hover { border-color: var(--accent); color: var(--accent); }
+      ol { padding-left: 20px; }
+      li { margin-bottom: 6px; }
+      .note {
+        border-left: 3px solid var(--accent); padding: 10px 14px; margin: 24px 0;
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+        border-radius: 0 4px 4px 0; font-size: 15px;
+      }
+      footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border);
+               color: var(--muted); font-size: 14px; }
+      a { color: var(--accent); }
+    </style>
+  </head>
+  <body>
+    <h1>Mailflow</h1>
+    <p class="tagline">
+      An Outlook add-in that turns a message's <code>Received:</code> headers into a
+      delivery timeline — every server it passed through, and how long it waited at each one.
+    </p>
+
+    <p class="note">
+      This page is just the host. The add-in itself only appears inside Outlook,
+      on a received message.
+    </p>
+
+    <h2>Manifest URL</h2>
+    <div class="url">
+      <code id="manifest">…</code>
+      <button id="copy" type="button">Copy</button>
+    </div>
+
+    <h2>Install for your whole tenant</h2>
+    <ol>
+      <li>Microsoft 365 admin center → <strong>Settings</strong> → <strong>Integrated apps</strong></li>
+      <li><strong>Upload custom apps</strong>, App type <strong>Office Add-in</strong></li>
+      <li><strong>Provide link to manifest file</strong> → paste the URL above</li>
+      <li>Assign users, then deploy. Test in Outlook on the web first — it updates
+        in minutes, while the desktop ribbon can take up to 24 hours.</li>
+    </ol>
+
+    <h2>Install for just yourself</h2>
+    <ol>
+      <li><a id="download" href="manifest.xml" download>Download the manifest</a> to your machine.
+        The sideload dialog no longer accepts a URL, only a file.</li>
+      <li>Go to <a href="https://aka.ms/olksideload">aka.ms/olksideload</a></li>
+      <li><strong>My add-ins</strong> → <strong>Add a custom add-in</strong> → <strong>Add from File</strong></li>
+      <li>Pick the manifest you just downloaded</li>
+    </ol>
+
+    <footer>
+      Requests <strong>ReadItem</strong> permission only. Runs entirely in the task
+      pane, makes no network calls, and has no backend — message content never
+      leaves your client.
+      <br /><br />
+      <a href="https://github.com/duhaas2015/mailflow">Source on GitHub</a>
+    </footer>
+
+    <script>
+      // Derived from this page's own location, so the URL is correct wherever
+      // the site is hosted — no build-time substitution needed.
+      var url = new URL("manifest.xml", location.href).href;
+      document.getElementById("manifest").textContent = url;
+
+      document.getElementById("copy").addEventListener("click", function () {
+        var button = this;
+        navigator.clipboard.writeText(url).then(function () {
+          button.textContent = "Copied";
+          setTimeout(function () { button.textContent = "Copy"; }, 1500);
+        });
+      });
+    </script>
+  </body>
+</html>
