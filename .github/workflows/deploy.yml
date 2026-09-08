@@ -45,6 +45,9 @@ jobs:
         run: npm run build
         env:
           ADDIN_BASE_URL: ${{ steps.pages.outputs.base_url }}
+          # Monotonic per build, so the admin center always sees a newer
+          # version than the one it already has.
+          ADDIN_VERSION: 1.0.${{ github.run_number }}.0
 
       - name: Prepare artifact
         run: |
@@ -55,6 +58,7 @@ jobs:
 
       - name: Verify the packaged manifest
         run: |
+          echo "Published version: $(grep -oE '<Version>[^<]+' dist/manifest.xml | cut -d'>' -f2)"
           echo "URLs in the published manifest:"
           grep -oE 'https://[^"<]+' dist/manifest.xml | sort -u
           if grep -q 'localhost' dist/manifest.xml; then

@@ -10,6 +10,12 @@ const devCerts = require("office-addin-dev-certs");
 const DEV_ORIGIN = "https://localhost:3000";
 const PROD_ORIGIN = (process.env.ADDIN_BASE_URL || DEV_ORIGIN).replace(/\/+$/, "");
 
+// The Microsoft 365 admin center keys a deployed add-in by Id + Version and
+// refuses an upload whose version it already holds ("Please update the version
+// number in the manifest file"). Stamping a unique version on every published
+// build means re-deploying is never rejected for that reason.
+const ADDIN_VERSION = process.env.ADDIN_VERSION;
+
 async function getHttpsOptions() {
   const httpsOptions = await devCerts.getHttpsServerOptions();
   return { ca: httpsOptions.ca, key: httpsOptions.key, cert: httpsOptions.cert };
@@ -94,7 +100,21 @@ module.exports = async (env, options) => {
                 );
               }
 
-              return content.toString().split(DEV_ORIGIN).join(PROD_ORIGIN);
+              let xml = content.toString().split(DEV_ORIGIN).join(PROD_ORIGIN);
+
+              if (ADDIN_VERSION) {
+                if (!/^\d+(\.\d+){0,3}$/.test(ADDIN_VERSION)) {
+                  throw new Error(
+                    `ADDIN_VERSION must be 1-4 dot-separated numbers, got "${ADDIN_VERSION}"`
+                  );
+                }
+                xml = xml.replace(
+                  /<Version>[^<]*<\/Version>/,
+                  `<Version>${ADDIN_VERSION}</Version>`
+                );
+              }
+
+              return xml;
             },
           },
         ],
