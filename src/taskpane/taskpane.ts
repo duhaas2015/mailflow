@@ -6,22 +6,62 @@ import type { Timeline } from "../parser/types.ts";
 /** Requirement set that introduced `getAllInternetHeadersAsync`. */
 const REQUIRED_MAILBOX_SET = "1.8";
 
+/** How long to wait for Office.js to hand off before saying something useful. */
+const OFFICE_READY_TIMEOUT_MS = 8000;
+
 let current: Timeline | undefined;
 
-Office.onReady((info) => {
-  if (info.host !== Office.HostType.Outlook) return;
+bootstrap();
 
-  const copyButton = document.getElementById("copy") as HTMLButtonElement | null;
-  copyButton?.addEventListener("click", copyReport);
+function bootstrap(): void {
+  const content = document.getElementById("content");
+  if (!content) return;
 
-  // Outlook keeps the task pane open when the user clicks a different message,
-  // so without this the pane would keep showing the previous message's hops.
-  if (Office.context.requirements.isSetSupported("Mailbox", "1.5")) {
-    Office.context.mailbox.addHandlerAsync(Office.EventType.ItemChanged, load);
+  // office.js is loaded from Microsoft's CDN. If the network blocks it, or the
+  // page is opened outside Outlook, the global never appears at all.
+  if (typeof Office === "undefined") {
+    showMessage(
+      content,
+      "Couldn't load the Office library.",
+      `Served from ${location.origin}. This usually means the page was opened ` +
+        "outside Outlook, or something blocked appsforoffice.microsoft.com."
+    );
+    return;
   }
 
-  load();
-});
+  // Office.onReady can simply never fire if the host doesn't complete the
+  // handshake. Without this the pane sits on "Loading…" with nothing to act on.
+  const watchdog = window.setTimeout(() => {
+    showMessage(
+      content,
+      "Outlook didn't finish initializing the add-in.",
+      `Served from ${location.origin}. Closing and reopening the task pane usually clears it.`
+    );
+  }, OFFICE_READY_TIMEOUT_MS);
+
+  Office.onReady(() => {
+    window.clearTimeout(watchdog);
+
+    // Deliberately not gating on info.host. Outlook on the web reports it as
+    // null in some contexts, and returning early there left the pane stuck on
+    // "Loading…" forever with no error to go on. This manifest only ever loads
+    // inside Outlook, so there was nothing to guard against in the first place.
+    const copyButton = document.getElementById("copy") as HTMLButtonElement | null;
+    copyButton?.addEventListener("click", copyReport);
+
+    // Outlook keeps the task pane open when the user clicks a different message,
+    // so without this the pane would keep showing the previous message's hops.
+    try {
+      if (Office.context?.requirements?.isSetSupported("Mailbox", "1.5")) {
+        Office.context.mailbox.addHandlerAsync(Office.EventType.ItemChanged, load);
+      }
+    } catch {
+      // Losing live refresh is survivable; failing to render is not.
+    }
+
+    load();
+  });
+}
 
 function load(): void {
   const content = document.getElementById("content");
@@ -30,6 +70,15 @@ function load(): void {
 
   current = undefined;
   if (copyButton) copyButton.disabled = true;
+
+  if (!Office.context?.mailbox) {
+    showMessage(
+      content,
+      "No mailbox available.",
+      `Served from ${location.origin}. The add-in has to run inside an Outlook mailbox.`
+    );
+    return;
+  }
 
   if (!Office.context.requirements.isSetSupported("Mailbox", REQUIRED_MAILBOX_SET)) {
     showMessage(
