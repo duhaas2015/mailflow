@@ -59,27 +59,41 @@ body {
 .bar button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 .bar button:disabled { opacity: 0.45; cursor: default; }
 
-main { padding: 16px; }
+main { padding: 14px 16px 24px; }
 
-/* Summary ---------------------------------------------------------------- */
+/* Summary — the at-a-glance answer ---------------------------------------- */
 
 .summary {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 14px 16px;
-  margin-bottom: 16px;
+  padding: 14px;
+  margin-bottom: 14px;
 }
 
-.total { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.total { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .total-value { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
 .total-label { color: var(--muted); font-size: 13px; }
+
+.blame {
+  margin: 12px 0 0;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: 0 4px 4px 0;
+  background: var(--bg);
+  font-size: 13px;
+}
+
+.blame--normal { border-left-color: var(--normal); }
+.blame--slow { border-left-color: var(--slow); }
+.blame--severe { border-left-color: var(--severe); }
 
 .facts {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 4px 12px;
-  margin: 0;
+  gap: 3px 12px;
+  margin: 12px 0 0;
   font-size: 13px;
 }
 
@@ -95,22 +109,18 @@ main { padding: 16px; }
   border-radius: 0 4px 4px 0;
 }
 
-/* Hops ------------------------------------------------------------------- */
+/* Hops — one line each, click to expand ----------------------------------- */
 
 .hops { list-style: none; margin: 0; padding: 0; }
 
 .hop {
-  display: grid;
-  grid-template-columns: 22px 96px 1fr;
-  gap: 12px;
-  padding: 12px 0;
-  border-top: 1px solid var(--border);
   position: relative;
+  border-top: 1px solid var(--border);
 }
 
 .hop:first-child { border-top: none; }
 
-/* The connector line that makes the list read as a single path. */
+/* Connector line, threaded through the index circles. */
 .hop::before {
   content: "";
   position: absolute;
@@ -121,21 +131,43 @@ main { padding: 16px; }
   background: var(--border);
 }
 
-.hop:first-child::before { top: 22px; }
-.hop:last-child::before { bottom: calc(100% - 22px); }
+.hop:first-child::before { top: 18px; }
+.hop:last-child::before { bottom: calc(100% - 18px); }
+
+.hop-summary {
+  display: grid;
+  grid-template-columns: 20px 56px 40px 1fr 10px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+/* Hide the native disclosure triangle in every engine. */
+.hop-summary::-webkit-details-marker { display: none; }
+.hop-summary::marker { content: ""; }
+
+.hop-summary:hover .hop-host { color: var(--accent); }
+
+.hop-summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
 
 .hop-index {
   position: relative;
   z-index: 1;
-  width: 22px;
-  height: 22px;
-  margin-top: 1px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--muted);
   font-size: 11px;
-  line-height: 20px;
+  line-height: 18px;
   text-align: center;
 }
 
@@ -145,54 +177,68 @@ main { padding: 16px; }
   font-weight: 600;
 }
 
-.hop-delay { min-width: 0; }
-.hop-delay-value { font-size: 13px; font-variant-numeric: tabular-nums; font-weight: 600; }
+.hop-delay {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: right;
+  color: var(--muted);
+}
+
+.hop--slow .hop-delay { color: var(--slow); }
+.hop--severe .hop-delay { color: var(--severe); }
 
 .hop-bar-track {
   height: 4px;
-  margin-top: 5px;
   border-radius: 2px;
   background: var(--border);
   overflow: hidden;
 }
 
-.hop-bar { height: 100%; border-radius: 2px; background: var(--normal); }
+.hop-bar { display: block; height: 100%; border-radius: 2px; background: var(--normal); }
 .hop--slow .hop-bar { background: var(--slow); }
 .hop--severe .hop-bar { background: var(--severe); }
 
-.hop-skew {
-  display: block;
-  margin-top: 4px;
-  font-size: 11px;
-  color: var(--slow);
-}
-
-.hop-body { min-width: 0; }
-.hop-host { font-weight: 600; overflow-wrap: anywhere; }
-.hop-from { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
-
-.hop-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.chip {
-  padding: 1px 6px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
+.hop-host {
+  font-size: 13px;
+  font-weight: 600;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Raw view --------------------------------------------------------------- */
+/* Chevron, rotating on open. */
+.hop-summary::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  justify-self: end;
+  border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+}
 
-.raw { margin-top: 20px; font-size: 12px; }
+.hop-details[open] .hop-summary::after { transform: rotate(45deg); }
+
+.hop-detail { padding: 2px 0 14px 28px; }
+
+.detail-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 10px;
+  margin: 0;
+  font-size: 12px;
+}
+
+.detail-facts dt { color: var(--muted); white-space: nowrap; }
+.detail-facts dd { margin: 0; overflow-wrap: anywhere; }
+
+/* Raw header views -------------------------------------------------------- */
+
+.raw { margin-top: 10px; font-size: 12px; }
+.raw--footer { margin-top: 20px; }
 .raw summary { cursor: pointer; color: var(--muted); }
-.raw-heading { font-size: 12px; margin: 12px 0 4px; }
 
 .raw-line {
   white-space: pre-wrap;
@@ -201,11 +247,11 @@ main { padding: 16px; }
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 8px;
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
-/* Empty and error states ------------------------------------------------- */
+/* Empty and error states -------------------------------------------------- */
 
 .empty { padding: 32px 8px; text-align: center; color: var(--muted); }
 .empty-title { font-size: 14px; color: var(--text); margin: 0 0 6px; }
