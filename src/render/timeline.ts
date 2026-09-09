@@ -57,32 +57,40 @@ function renderSummary(timeline: Timeline): HTMLElement {
   const worstDelay = worst?.delaySeconds;
 
   if (worst && worstDelay) {
-    const blame = el("p", `blame blame--${severityOf(worstDelay)}`);
-    const host = worst.received.by ?? "an unnamed server";
+    const blame = el("div", `blame blame--${severityOf(worstDelay)}`);
+    const name = worst.received.by ?? "an unnamed server";
 
     // A skewed clock can make one hop read as longer than the whole journey.
     // Calling it part of the total would then be arithmetic nonsense, so name
     // the hop without asserting the relationship.
     const partOfTotal = timeline.totalSeconds !== null && worstDelay <= timeline.totalSeconds;
 
+    const lead = el("p", "blame-lead");
     if (partOfTotal) {
-      blame.append(
+      lead.append(
         el("strong", undefined, formatDuration(worstDelay)),
         document.createTextNode(" of that was hop "),
         el("strong", undefined, String(worst.position)),
-        document.createTextNode(", into "),
-        el("strong", undefined, host)
+        document.createTextNode(", into")
       );
     } else {
-      blame.append(
+      lead.append(
         document.createTextNode("Slowest was hop "),
         el("strong", undefined, String(worst.position)),
         document.createTextNode(" at "),
         el("strong", undefined, formatDuration(worstDelay)),
-        document.createTextNode(", into "),
-        el("strong", undefined, host)
+        document.createTextNode(", into")
       );
     }
+    blame.append(lead);
+
+    // Split the same way the hop rows do. A mail hostname is one unbreakable
+    // token, so left inline it simply runs off the edge of the pane.
+    const { label, domain } = splitHostname(name);
+    const host = el("p", "blame-host");
+    host.append(el("span", "blame-host-label", label));
+    if (domain) host.append(el("span", "blame-host-domain", domain));
+    blame.append(host);
 
     summary.append(blame);
   }

@@ -83,7 +83,15 @@ main { padding: 14px 16px 24px; }
   border-radius: 0 4px 4px 0;
   background: var(--bg);
   font-size: 13px;
+  /* Last-resort guard: no hostname should be able to escape the card, even
+     one with no dot to break at. */
+  overflow-wrap: anywhere;
 }
+
+.blame p { margin: 0; }
+.blame-host { margin-top: 4px; }
+.blame-host-label { display: block; font-weight: 600; }
+.blame-host-domain { display: block; font-size: 11px; color: var(--muted); line-height: 1.35; }
 
 .blame--normal { border-left-color: var(--normal); }
 .blame--slow { border-left-color: var(--slow); }
