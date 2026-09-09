@@ -1,5 +1,7 @@
 import type { Hop, Timeline } from "../parser/types.ts";
 import { formatDuration, formatTimestamp, severityOf, splitHostname } from "./format.ts";
+import { describeRole } from "./role.ts";
+import type { HopRole } from "./role.ts";
 
 /**
  * Every string on this screen came off the wire and is controlled by whoever
@@ -32,7 +34,10 @@ export function renderTimeline(timeline: Timeline, root: HTMLElement): void {
   const longest = Math.max(...timeline.hops.map((h) => h.delaySeconds ?? 0), 1);
 
   const list = el("ol", "hops");
-  for (const hop of timeline.hops) list.append(renderHop(hop, longest, timeline.slowest));
+  timeline.hops.forEach((hop, i) => {
+    const isLast = i === timeline.hops.length - 1;
+    list.append(renderHop(hop, longest, timeline.slowest, i === 0, isLast));
+  });
   root.append(list);
 
   const auth = renderAuthResults(timeline);
@@ -118,7 +123,13 @@ function addFact(list: HTMLElement, label: string, value: string): void {
  * server. Detail is behind a native <details> so the whole chain fits on one
  * screen and expanding is keyboard-accessible for free.
  */
-function renderHop(hop: Hop, longest: number, slowest: Hop | undefined): HTMLElement {
+function renderHop(
+  hop: Hop,
+  longest: number,
+  slowest: Hop | undefined,
+  isFirst: boolean,
+  isLast: boolean
+): HTMLElement {
   const severity = severityOf(hop.delaySeconds);
   const item = el("li", `hop hop--${severity}`);
   if (slowest && hop.position === slowest.position && hop.delaySeconds) {
@@ -154,18 +165,32 @@ function renderHop(hop: Hop, longest: number, slowest: Hop | undefined): HTMLEle
   const host = el("span", "hop-host");
   host.title = name;
   host.append(el("span", "hop-host-label", label));
-  if (domain) host.append(el("span", "hop-host-domain", domain));
+
+  const role = describeRole(hop, isFirst, isLast);
+
+  if (domain || role) {
+    // Domain and badge share the second line, so naming the hop's part in the
+    // journey costs no extra height.
+    const line = el("span", "hop-host-line2");
+    line.append(el("span", "hop-host-domain", domain ?? ""));
+    if (role) line.append(el("span", "hop-role", role.label));
+    host.append(line);
+  }
+
   summary.append(host);
 
-  details.append(summary, renderHopDetail(hop));
+  details.append(summary, renderHopDetail(hop, role));
   item.append(details);
   return item;
 }
 
-function renderHopDetail(hop: Hop): HTMLElement {
+function renderHopDetail(hop: Hop, role: HopRole | undefined): HTMLElement {
   const detail = el("div", "hop-detail");
   const facts = el("dl", "detail-facts");
   const received = hop.received;
+
+  // The badge is a claim, so the evidence behind it travels with it.
+  if (role) addFact(facts, role.label, role.because);
 
   // The summary truncates long names, so this is the one place the receiving
   // server is guaranteed to appear in full.
