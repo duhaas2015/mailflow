@@ -1,5 +1,5 @@
 import type { Hop, Timeline } from "../parser/types.ts";
-import { formatDuration, formatTimestamp, severityOf } from "./format.ts";
+import { formatDuration, formatTimestamp, severityOf, splitHostname } from "./format.ts";
 
 /**
  * Every string on this screen came off the wire and is controlled by whoever
@@ -137,10 +137,16 @@ function renderHop(hop: Hop, longest: number, slowest: Hop | undefined): HTMLEle
   track.append(bar);
   summary.append(track);
 
-  const host = el("span", "hop-host", hop.received.by ?? "unknown server");
-  // The name is truncated to keep the row to one line; the full value is still
-  // reachable on hover, and in full when the row is expanded.
-  host.title = hop.received.by ?? "unknown server";
+  // The label carries the identity and the domain is mostly boilerplate, so
+  // they get separate lines: the distinguishing part stays readable instead of
+  // being the first casualty of truncation.
+  const name = hop.received.by ?? "unknown server";
+  const { label, domain } = splitHostname(name);
+
+  const host = el("span", "hop-host");
+  host.title = name;
+  host.append(el("span", "hop-host-label", label));
+  if (domain) host.append(el("span", "hop-host-domain", domain));
   summary.append(host);
 
   details.append(summary, renderHopDetail(hop));
@@ -153,6 +159,9 @@ function renderHopDetail(hop: Hop): HTMLElement {
   const facts = el("dl", "detail-facts");
   const received = hop.received;
 
+  // The summary truncates long names, so this is the one place the receiving
+  // server is guaranteed to appear in full.
+  if (received.by) addFact(facts, "Server", received.by);
   addFact(facts, "Received at", formatTimestamp(received.timestamp));
 
   if (hop.clockSkew) {

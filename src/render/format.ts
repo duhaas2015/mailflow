@@ -48,3 +48,21 @@ export function bareAddress(value: string | undefined): string | undefined {
   const angled = /<([^>]+)>/.exec(value);
   return (angled?.[1] ?? value).trim();
 }
+
+/**
+ * Split a hostname into its leading label and the rest of the domain.
+ *
+ * Mail hostnames are mostly shared boilerplate — a dozen Exchange Online hops
+ * differ only in the first label — so showing the label prominently and the
+ * domain quietly puts the distinguishing part where the eye lands.
+ */
+export function splitHostname(host: string): { label: string; domain?: string } {
+  // Address literals have no meaningful split: chopping "10.1.1.2" at the
+  // first dot would present "10" as if it were a server name.
+  if (host.includes(":") || /^[\d.]+$/.test(host)) return { label: host };
+
+  const dot = host.indexOf(".");
+  if (dot <= 0) return { label: host };
+
+  return { label: host.slice(0, dot), domain: host.slice(dot + 1) };
+}

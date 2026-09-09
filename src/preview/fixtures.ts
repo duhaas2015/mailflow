@@ -44,6 +44,32 @@ Subject: Signed contract attached
 Message-ID: <20260904103801.77De11@smtp.partner.example>`,
   },
   {
+    name: "Exchange Online only — long, near-identical hostnames",
+    headers: `Received: from CH3PR05MB9434.namprd05.prod.outlook.com (2603:10b6:610:1f3::8)
+ by CH2PR05MB7215.namprd05.prod.outlook.com with HTTPS; Tue, 8 Sep 2026
+ 17:40:26 +0000
+Received: from CC6PR05MB223767.namprd05.prod.outlook.com (2603:10b6:170:205::23)
+ by CH3PR05MB9434.namprd05.prod.outlook.com (2603:10b6:610:1f3::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7891.21;
+ Tue, 8 Sep 2026 17:40:26 +0000
+Received: from BN9PR03CA0129.namprd03.prod.outlook.com (2603:10b6:408:fe::14)
+ by CC6PR05MB223767.namprd05.prod.outlook.com (2603:10b6:170:205::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7891.21;
+ Tue, 8 Sep 2026 17:40:04 +0000
+Received: from BN3PEPF00022B9A5.namprd05.prod.outlook.com (2a01:111:f403:f900::3)
+ by BN9PR03CA0129.outlook.office365.com (2603:10b6:408:fe::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256)
+ id 15.20.7891.21 via Frontend Transport; Tue, 8 Sep 2026 17:40:04 +0000
+Date: Tue, 8 Sep 2026 17:40:04 +0000
+From: Office365Alerts@microsoft.com
+To: duane@nextact.org
+Subject: Informational-severity alert: Email messages removed after delivery
+Message-ID: <alert-f6558522@microsoft.com>
+X-MS-Exchange-Transport-EndToEndLatency: 00:00:22.0937500`,
+  },
+  {
     name: "Servers disagreeing about the time",
     headers: `Received: from b.example.com by c.example.com with ESMTP id 33;
  Thu, 4 Sep 2026 10:00:30 +0000
