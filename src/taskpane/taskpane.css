@@ -8,6 +8,8 @@
   --normal: #6bb700;
   --slow: #f7a501;
   --severe: #d13438;
+  /* Distinct from the delay colours: provenance isn't a severity. */
+  --ai: #8764b8;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -116,6 +118,34 @@ main { padding: 14px 16px 24px; }
   font-size: 13px;
   border-radius: 0 4px 4px 0;
 }
+
+/* Sender-declared AI generation -------------------------------------------- */
+
+.ai-flag {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--ai);
+  border-radius: 0 4px 4px 0;
+  background: color-mix(in srgb, var(--ai) 7%, transparent);
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+
+.ai-flag-title { margin: 0 0 6px; font-weight: 600; }
+
+.ai-flag-headers {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 10px;
+  margin: 0 0 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+.ai-flag-headers dt { color: var(--muted); }
+.ai-flag-headers dd { margin: 0; overflow-wrap: anywhere; }
+
+.ai-flag-note { margin: 0; font-size: 12px; color: var(--muted); }
 
 /* Hops — one line each, click to expand ----------------------------------- */
 

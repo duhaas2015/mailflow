@@ -76,6 +76,12 @@ export interface Timeline {
    */
   exchangeLatencySeconds?: number;
   authResults?: string;
+  /**
+   * Headers in which the sending software declared the message AI-generated,
+   * such as `X-AI-Generated: mcp-office365`. Self-declared: present means the
+   * sender's tooling says so; absent proves nothing.
+   */
+  aiDeclarations: RawHeader[];
   /** Non-fatal problems worth showing the user rather than silently swallowing. */
   warnings: string[];
 }

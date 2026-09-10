@@ -1,5 +1,6 @@
 import { getHeader, getHeaders, parseHeaderBlock, stripComments } from "./headers.ts";
 import { parseRfc5322Date } from "./date.ts";
+import { findAiDeclarations } from "./provenance.ts";
 import type { Hop, ReceivedHeader, Timeline } from "./types.ts";
 
 /** Clause keywords defined for the `Received:` field by RFC 5321 §4.4. */
@@ -278,6 +279,7 @@ export function buildTimeline(rawHeaders: string): Timeline {
       getHeader(headers, "X-MS-Exchange-Transport-EndToEndLatency")
     ),
     authResults: getHeader(headers, "Authentication-Results"),
+    aiDeclarations: findAiDeclarations(headers),
     warnings,
   };
 }

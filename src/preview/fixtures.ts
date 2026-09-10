@@ -67,6 +67,7 @@ From: Office365Alerts@microsoft.com
 To: duane@nextact.org
 Subject: Informational-severity alert: Email messages removed after delivery
 Message-ID: <alert-f6558522@microsoft.com>
+X-AI-Generated: mcp-office365
 X-MS-Exchange-Transport-EndToEndLatency: 00:00:22.0937500`,
   },
   {

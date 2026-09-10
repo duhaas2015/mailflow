@@ -16,6 +16,10 @@ export function textReport(timeline: Timeline): string {
   lines.push(`Total:     ${formatDuration(timeline.totalSeconds)} across ${timeline.hops.length} hops`);
 
   if (timeline.messageId) lines.push(`Message-ID: ${timeline.messageId}`);
+
+  for (const header of timeline.aiDeclarations) {
+    lines.push(`AI-generated (sender-declared): ${header.name}: ${header.value}`);
+  }
   lines.push("");
 
   for (const hop of timeline.hops) {
